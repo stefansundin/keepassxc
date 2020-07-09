@@ -645,7 +645,7 @@ void MainWindow::openRecentDatabase(QAction* action)
 void MainWindow::clearLastDatabases()
 {
     config()->remove(Config::LastDatabases);
-    bool inWelcomeWidget = (m_ui->stackedWidget->currentIndex() == 2);
+    bool inWelcomeWidget = (m_ui->stackedWidget->currentIndex() == WelcomeScreen);
 
     if (inWelcomeWidget) {
         m_ui->welcomeWidget->refreshLastDatabases();
@@ -984,11 +984,12 @@ void MainWindow::openKeyboardShortcuts()
 
 void MainWindow::switchToDatabases()
 {
-    if (m_ui->tabWidget->currentIndex() == -1) {
-        m_ui->stackedWidget->setCurrentIndex(WelcomeScreen);
-    } else {
-        m_ui->stackedWidget->setCurrentIndex(DatabaseTabScreen);
-    }
+    m_ui->stackedWidget->setCurrentIndex(DatabaseTabScreen);
+    // if (m_ui->tabWidget->currentIndex() == -1) {
+    //     m_ui->stackedWidget->setCurrentIndex(WelcomeScreen);
+    // } else {
+    //     m_ui->stackedWidget->setCurrentIndex(DatabaseTabScreen);
+    // }
 }
 
 void MainWindow::switchToSettings(bool enabled)
@@ -1091,11 +1092,12 @@ void MainWindow::selectPreviousDatabaseTab()
 
 void MainWindow::databaseTabChanged(int tabIndex)
 {
-    if (tabIndex != -1 && m_ui->stackedWidget->currentIndex() == WelcomeScreen) {
-        m_ui->stackedWidget->setCurrentIndex(DatabaseTabScreen);
-    } else if (tabIndex == -1 && m_ui->stackedWidget->currentIndex() == DatabaseTabScreen) {
-        m_ui->stackedWidget->setCurrentIndex(WelcomeScreen);
-    }
+    m_ui->stackedWidget->setCurrentIndex(DatabaseTabScreen);
+    // if (tabIndex != -1 && m_ui->stackedWidget->currentIndex() == WelcomeScreen) {
+    //     m_ui->stackedWidget->setCurrentIndex(DatabaseTabScreen);
+    // } else if (tabIndex == -1 && m_ui->stackedWidget->currentIndex() == DatabaseTabScreen) {
+    //     m_ui->stackedWidget->setCurrentIndex(WelcomeScreen);
+    // }
 
     m_actionMultiplexer.setCurrentObject(m_ui->tabWidget->currentDatabaseWidget());
 }

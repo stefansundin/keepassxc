@@ -38,6 +38,7 @@
 #include "gui/DragTabBar.h"
 #include "gui/FileDialog.h"
 #include "gui/MessageBox.h"
+#include "gui/WelcomeWidget.h"
 #include "gui/entry/EntryView.h"
 #include "gui/group/GroupView.h"
 #ifdef Q_OS_MACOS
@@ -54,6 +55,11 @@ DatabaseTabWidget::DatabaseTabWidget(QWidget* parent)
     auto* tabBar = new DragTabBar(this);
     setTabBar(tabBar);
     setDocumentMode(true);
+
+    auto* welcomeWidget = new WelcomeWidget(this);
+    addTab(welcomeWidget, "+");
+    // int index = addTab(welcomeWidget, "+");
+    // addDatabaseTab(dbWidget, inBackground);
 
     // clang-format off
     connect(this, SIGNAL(tabCloseRequested(int)), SLOT(closeDatabaseTab(int)));
@@ -167,7 +173,7 @@ void DatabaseTabWidget::addDatabaseTab(const QString& filePath,
         return;
     }
 
-    for (int i = 0, c = count(); i < c; ++i) {
+    for (int i = 0, c = count()-1; i < c; ++i) {
         auto* dbWidget = databaseWidgetFromIndex(i);
         Q_ASSERT(dbWidget);
         if (dbWidget
@@ -359,7 +365,7 @@ bool DatabaseTabWidget::closeAllDatabaseTabs()
 {
     // Attempt to lock all databases first to prevent closing only a portion of tabs
     if (lockDatabases()) {
-        while (count() > 0) {
+        while (count()-1 > 0) {
             if (!closeDatabaseTab(0)) {
                 return false;
             }
@@ -526,7 +532,7 @@ bool DatabaseTabWidget::canSave(int index) const
 
 bool DatabaseTabWidget::hasLockableDatabases() const
 {
-    for (int i = 0, c = count(); i < c; ++i) {
+    for (int i = 0, c = count()-1; i < c; ++i) {
         if (!databaseWidgetFromIndex(i)->isLocked()) {
             return true;
         }
@@ -543,7 +549,7 @@ bool DatabaseTabWidget::hasLockableDatabases() const
  */
 QString DatabaseTabWidget::tabName(int index)
 {
-    if (index == -1 || index > count()) {
+    if (index == -1 || index > count()-1) {
         return "";
     }
 
@@ -627,7 +633,7 @@ DatabaseWidget* DatabaseTabWidget::currentDatabaseWidget()
 bool DatabaseTabWidget::lockDatabases()
 {
     int numLocked = 0;
-    int c = count();
+    int c = count()-1;
     for (int i = 0; i < c; ++i) {
         auto dbWidget = databaseWidgetFromIndex(i);
         if (dbWidget->lock()) {
@@ -739,7 +745,7 @@ void DatabaseTabWidget::performGlobalAutoType()
 {
     QList<QSharedPointer<Database>> unlockedDatabases;
 
-    for (int i = 0, c = count(); i < c; ++i) {
+    for (int i = 0, c = count()-1; i < c; ++i) {
         auto* dbWidget = databaseWidgetFromIndex(i);
         if (!dbWidget->isLocked()) {
             unlockedDatabases.append(dbWidget->database());
@@ -749,7 +755,7 @@ void DatabaseTabWidget::performGlobalAutoType()
     // TODO: allow for database selection during Auto-Type instead of using the current tab
     if (!unlockedDatabases.isEmpty()) {
         autoType()->performGlobalAutoType(unlockedDatabases);
-    } else if (count() > 0) {
+    } else if (count()-1 > 0) {
         if (config()->get(Config::Security_RelockAutoType).toBool()) {
             m_dbWidgetPendingLock = currentDatabaseWidget();
         }
